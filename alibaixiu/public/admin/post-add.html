@@ -78,6 +78,7 @@
                     </div>
                     <div class="form-group">
                         <button class="btn btn-primary" type="button" id="pAdd">保存</button>
+                        <button class="btn btn-primary" type="button" id="pEdit" style="display:none">编辑</button>
                     </div>
                 </div>
             </form>
@@ -86,8 +87,10 @@
 
     <div class="aside">
         <div class="profile">
-            <img class="avatar" src="../uploads/avatar.jpg">
-            <h3 class="name">Coder</h3>
+            <!-- <img class="avatar" src="../uploads/avatar.jpg">
+            <h3 class="name">Coder</h3> -->
+            <img class="avatar" src="">
+            <h3 class="name"></h3>
         </div>
         <ul class="nav">
             <li>
@@ -124,9 +127,6 @@
     <script src="../assets/vendors/jquery/jquery.js"></script>
     <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
     <script src="../assets/vendors/art-template/template-web.js"></script>
-    <script>
-        NProgress.done()
-    </script>
     <script type="text/javascript" src="../assets/js/common.js"></script>
 
     <!-- 构建模板 -->
@@ -182,6 +182,78 @@
                 }
             });
         });
+
+        // 获取浏览器地址栏中的id参数
+        var id = getUrlParams('id');
+        // 当前管理员是在做修改文章操作
+        if (id != -1) {
+            // 编辑功能 根据传递过来的id去请求服务器将这篇文章的所有数据查询
+            $.ajax({
+                type: 'get',
+                url: '/posts/' + id,
+                success: function(res) {
+                    console.log(res);
+                    $('#title').val(res.title);
+                    $('#content').val(res.content);
+                    $('h1').text('编辑文章');
+                    // 预览图片
+                    $('#prev').show().attr('src', res.thumbnail);
+                    $('#img').val(res.thumbnail);
+
+                    // 将对应的分类显示出来 
+                    $('#category > option').each((index, item) => {
+                        // 判断option里面的value属性的值与res.category的值是否相等 如果相等 就表示是这个分类 给其设置一个selected 
+                        if ($(item).attr('value') == res.category) {
+                            $(item).prop('selected', true);
+                        }
+                    });
+
+
+                    $('#status > option').each((index, item) => {
+                        // 判断option里面的value属性的值与res.category的值是否相等 如果相等 就表示是这个分类 给其设置一个selected 
+                        if ($(item).attr('value') == res.state) {
+                            $(item).prop('selected', true);
+                        }
+                    });
+
+                    $('#created').val(res.createAt.substr(0, 16));
+
+                    // 将保存按钮隐藏 将编辑按钮显示出来 
+                    $('#pAdd').hide();
+                    $('#pEdit').show();
+
+                }
+            })
+        }
+
+        console.log(getUrlParams('id'));
+
+        // 从浏览器的地址栏中获取查询参数
+        function getUrlParams(name) {
+            var paramsAry = location.search.substr(1).split('&');
+            // 循环数据
+            for (var i = 0; i < paramsAry.length; i++) {
+                var tmp = paramsAry[i].split('=');
+                if (tmp[0] == name) {
+                    return tmp[1];
+                }
+            }
+            return -1;
+        }
+
+        $('#pEdit').on('click', function() {
+            $.ajax({
+                type: 'put',
+                url: '/posts/' + id,
+                data: $('form').serialize(),
+                success: function(res) {
+                    location.href = 'posts.html';
+                }
+            });
+        });
+    </script>
+    <script>
+        NProgress.done()
     </script>
 </body>
 

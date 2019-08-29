@@ -151,8 +151,10 @@
 
     <div class="aside">
         <div class="profile">
-            <img class="avatar" src="../uploads/avatar.jpg">
-            <h3 class="name">Coder</h3>
+            <!-- <img class="avatar" src="../uploads/avatar.jpg">
+            <h3 class="name">Coder</h3> -->
+            <img class="avatar" src="">
+            <h3 class="name"></h3>
         </div>
         <ul class="nav">
             <li>
@@ -188,9 +190,6 @@
 
     <script src="../assets/vendors/jquery/jquery.js"></script>
     <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
-    <script>
-        NProgress.done()
-    </script>
     <script type="text/javascript" src="../assets/js/common.js"></script>
     <script src="../assets/vendors/art-template/template-web.js"></script>
     <script type="text/html" id="userTpl">
@@ -328,8 +327,12 @@
                 url: '/users/' + id,
                 data: formData,
                 success: function(res) {
+                    // 通过res对象里面的_id属性的值去数组中 userArr这个数组将对应的元素找出来 
+                    // 如果数组里面的元素的_id的值刚好等于了res._id 
                     var index = userArr.findIndex(item => item._id == res._id);
+                    //将res这个对象赋值给了userArr这个数组里面的指定元素
                     userArr[index] = res;
+                    //重新渲染数据
                     render(userArr);
                     $('#addUser').show();
                     $('#editUser').hide();
@@ -401,13 +404,17 @@
         })
 
         //给批量删除按钮注册点击事件
-        // $('#allDel').on('click', function() {
-        //     var ids = [];
-        //     //获取选中用户
+        $('#allDel').on('click', function() {
+            // 将所有选中的input的这一行删除
+            var checkUser = $('tbody input:checkde');
+            var ids = [];
+            //获取选中用户
 
-        // })
+        })
     </script>
-
+    <script>
+        NProgress.done()
+    </script>
 </body>
 
 </html>

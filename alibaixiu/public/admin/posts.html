@@ -106,8 +106,10 @@
 
     <div class="aside">
         <div class="profile">
-            <img class="avatar" src="../uploads/avatar.jpg">
-            <h3 class="name">Coder</h3>
+            <!-- <img class="avatar" src="../uploads/avatar.jpg">
+            <h3 class="name">Coder</h3> -->
+            <img class="avatar" src="">
+            <h3 class="name"></h3>
         </div>
         <ul class="nav">
             <li>
@@ -144,9 +146,6 @@
     <script src="../assets/vendors/jquery/jquery.js"></script>
     <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
     <script src="../assets/vendors/art-template/template-web.js"></script>
-    <script>
-        NProgress.done()
-    </script>
     <script type="text/javascript" src="../assets/js/common.js"></script>
 
     <!-- 显示所有文章 -->
@@ -159,8 +158,8 @@
             <td class="text-center">{{$value.createAt && $value.createAt.substr(0,10)}}</td>
             <td class="text-center">{{$value.state ==1?'已发布':'草稿'}}</td>
             <td class="text-center">
-                <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
-                <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+                <a href="post-add.html?id={{$value._id}}" class="btn btn-default btn-xs">编辑</a>
+                <a href="javascript:;" class="btn btn-danger btn-xs delete" data-id="{{$value._id}}">删除</a>
             </td>
         </tr>
         {{/each}}
@@ -201,6 +200,8 @@
                 },
                 success: function(res) {
                     // console.log(res);
+                    // 给window对象添加一个属性 
+                    window.currentPage = res.page;
                     var str = template('pTpl', res);
                     $('tbody').html(str);
 
@@ -224,7 +225,6 @@
         }
 
         //将所有的分类展示到这个页面上
-
         $.ajax({
             type: 'get',
             url: '/categories',
@@ -238,12 +238,39 @@
             }
         });
 
+        //筛选功能
         $('#btnSearch').on('click', function() {
             c = $('#category').val();
             s = $('#state').val();
 
             render(c, s);
         });
+
+        //删除文章功能
+        $('tbody').on('click', '.delete', function() {
+            if (confirm('确定要删除吗?')) {
+                var id = $(this).attr('data-id');
+                $.ajax({
+                    type: 'delete',
+                    url: '/posts/' + id,
+                    success: function() {
+                        if ($('tbody').children().length == 1) {
+                            // 如果当前页已经是第一页  我们就让它在这一页 
+                            if (currentPage == 1) {
+                                render(s, c, currentPage);
+                            } else {
+                                render(s, c, currentPage - 1);
+                            }
+                        } else {
+                            render(s, c, currentPage);
+                        }
+                    }
+                });
+            }
+        })
+    </script>
+    <script>
+        NProgress.done()
     </script>
 </body>
 
